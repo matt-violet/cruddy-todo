@@ -7,10 +7,19 @@ var items = {};
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
+// create new file in HD for each todo text
+// name file based on unique id
 exports.create = (text, callback) => {
-  var id = counter.getNextUniqueId();
-  items[id] = text;
-  callback(null, { id, text });
+  counter.getNextUniqueId((err, counterString) => {
+    var filePath = path.join(exports.dataDir, counterString + '.txt');
+    fs.writeFile(filePath, text, (err) => {
+      if (err) {
+        throw ('error writing text file');
+      } else {
+        callback(null, { id: counterString, text: text });
+      }
+    });
+  });
 };
 
 exports.readAll = (callback) => {
