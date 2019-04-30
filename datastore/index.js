@@ -73,7 +73,7 @@ exports.delete = (id, callback) => {
     } else {
       callback();
     }
-  })  
+  });  
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
