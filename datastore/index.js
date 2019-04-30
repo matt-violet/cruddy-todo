@@ -23,30 +23,60 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
+  fs.readdir(exports.dataDir, function (err, files) {
+    if (err) {
+      throw ('error writing text file');
+    } else {
+      var files = _.map(files, (id) => {
+        return { id: id.slice(0, id.length - 4), text: id.slice(0, id.length - 4) };
+      });
+      callback(null, files);
+    }
   });
-  callback(null, data);
 };
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  var filePath = path.join(exports.dataDir, id + '.txt');
+  fs.readFile(filePath, function (err, fileData) {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      callback(null, { id: id, text: fileData.toString() });
+    }
+  });
 };
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  // declare filpath
+  var filePath = path.join(exports.dataDir, id + '.txt');
+  // access todo file using id
+  fs.readFile(filePath, function (err, fileData) {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      fs.writeFile(filePath, text, (err) => {
+        if (err) {
+          throw ('error writing text file');
+        } else {
+          callback(null, { id: id, text: text });
+        }
+      });
+    }
+  });
 };
+// update contents with text
+// write updated text to file
+// callback
+
+
+// var item = items[id];
+// if (!item) {
+//   callback(new Error(`No item with id: ${id}`));
+// } else {
+//   items[id] = text;
+//   callback(null, { id, text });
+// }
+
 
 exports.delete = (id, callback) => {
   var item = items[id];
